@@ -16,6 +16,7 @@ require_once 'XML/SVG/Element.php';
  */
 class XML_SVG_Textpath extends XML_SVG_Element 
 {
+	protected static $tag = 'textpath';
 
     var $_text;
     var $_x;

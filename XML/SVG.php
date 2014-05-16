@@ -10,6 +10,7 @@
  */
 require_once 'XML/SVG/Animate.php';
 require_once 'XML/SVG/Circle.php';
+require_once 'XML/SVG/ClipPath.php';
 require_once 'XML/SVG/Defs.php';
 require_once 'XML/SVG/Desc.php';
 require_once 'XML/SVG/Document.php';
@@ -28,6 +29,7 @@ require_once 'XML/SVG/Polygon.php';
 require_once 'XML/SVG/Polyline.php';
 require_once 'XML/SVG/RadialGradient.php';
 require_once 'XML/SVG/Rect.php';
+require_once 'XML/SVG/Root.php';
 require_once 'XML/SVG/Stop.php';
 require_once 'XML/SVG/Textpath.php';
 require_once 'XML/SVG/Text.php';
@@ -35,4 +37,23 @@ require_once 'XML/SVG/Title.php';
 require_once 'XML/SVG/Tref.php';
 require_once 'XML/SVG/Tspan.php';
 require_once 'XML/SVG/Use.php';
+
+class XML_SVG
+{
+
+	public static $ELEM_ANIMATION = array(
+		'animate',
+		'animateColor',
+		'animateMotion',
+		'animateTransform',
+		'set',
+	);
+
+	public static $ELEM_DESCRIPTIVE = array(
+		'desc',
+		'metadata',
+		'title',
+	);
+
+}
 

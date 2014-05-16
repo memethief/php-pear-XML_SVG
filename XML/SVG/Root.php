@@ -8,49 +8,44 @@
  * @package XML_SVG
  * @license http://www.fsf.org/copyleft/lgpl.html
  */
-require_once 'XML/SVG/Element.php';
 
 /**
- * XML_SVG_Rect
+ * XML_SVG_Root
+ *
+ * This represents the root <svg> element.
  *
  * @package XML_SVG
  */
-class XML_SVG_Rect extends XML_SVG_Element 
+class XML_SVG_Root extends XML_SVG_Element
 {
-	protected static $tag = 'rect';
+	protected static $tag = 'svg';
 	private static $extra_attributes = array(
 		'class',
 		'style',
 		'externalResourcesRequired',
-		'transform',
 		'x',
 		'y',
 		'width',
 		'height',
-		'rx',
-		'ry',
+		'viewBox',
+		'preserveAspectRatio',
+		'zoomAndPan',
+		'version',
+		'baseProfile',
+		'contentScriptType',
+		'contentStyleType',
 	);
 
-	public static function getNew($x=false, $y=false, $w=false, $h=false) {
-		$rect = parent::getNew();
-		$rect->x = $x;
-		$rect->y = $y;
-		$rect->width = $w;
-		$rect->height = $h;
-		return $rect;
-		/*
-		return parent::getNew();
-		 */
+	public static $XMLNS_XMLNS = 'http://www.w3.org/2000/xmlns';
+	public static $XMLNS = 'http://www.w3.org/2000/svg';        
+	public static $XMLNS_XLINK = 'http://www.w3.org/1999/xlink';
+
+	public static function getNew() {
+		return parent::getNew('', self::$XMLNS);
 	}
 
-	protected function initialize() {
-		return;
-		list($x, $y, $height, $width) = func_get_args();
-		$this->x = $x;
-		$this->y = $y;
-		$this->height = $height;
-		$this->width = $width;
-		return $this;
+	public function initialize() {
+		//$this->setAttribute("xmlns:xlink", self::$XMLNS_XLINK);
 	}
 
 	protected static function getAttributes() {
@@ -63,4 +58,3 @@ class XML_SVG_Rect extends XML_SVG_Element
 		);
 	}
 }
-

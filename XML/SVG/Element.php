@@ -17,109 +17,221 @@
  *
  * @package XML_SVG
  */
-class XML_SVG_Element 
+class XML_SVG_Element extends DOMElement
 {
+	protected static $tag = null;
+	public static $ATTR_CONDITIONAL_PROCESSING = array(
+		'requiredFeatures',
+		'requiredExtensions',
+		'systemLanguage',
+	);
+	public static $ATTR_CORE = array(
+		'id',
+		'xml:base',
+		'xml:lang',
+		'xml:space',
+	);
+	public static $ATTR_GRAPHICAL_EVENT = array(
+		'onfocusin',
+		'onfocusout',
+		'onactivate',
+		'onclick',
+		'onmousedown',
+		'onmouseup',
+		'onmouseover',
+		'onmousemove',
+		'onmouseout',
+		'onload',
+	);
+	public static $ATTR_PRESENTATION = array(
+		'alignment-baseline',
+		'baseline-shift',
+		'clip',
+		'clip-path',
+		'clip-rule',
+		'color',
+		'color-interpolation',
+		'color-interpolation-filters',
+		'color-profile',
+		'color-rendering',
+		'cursor',
+		'direction',
+		'display',
+		'dominant-baseline',
+		'enable-background',
+		'fill',
+		'fill-opacity',
+		'fill-rule',
+		'filter',
+		'flood-color',
+		'flood-opacity',
+		'font-family',
+		'font-size',
+		'font-size-adjust',
+		'font-stretch',
+		'font-style',
+		'font-variant',
+		'font-weight',
+		'glyph-orientation-horizontal',
+		'glyph-orientation-vertical',
+		'image-rendering',
+		'kerning',
+		'letter-spacing',
+		'lighting-color',
+		'marker-end',
+		'marker-mid',
+		'marker-start',
+		'mask',
+		'opacity',
+		'overflow',
+		'pointer-events',
+		'shape-rendering',
+		'stop-color',
+		'stop-opacity',
+		'stroke',
+		'stroke-dasharray',
+		'stroke-dashoffset',
+		'stroke-linecap',
+		'stroke-linejoin',
+		'stroke-miterlimit',
+		'stroke-opacity',
+		'stroke-width',
+		'text-anchor',
+		'text-decoration',
+		'text-rendering',
+		'unicode-bidi',
+		'visibility',
+		'word-spacing',
+		'writing-mode',
+	);
 
-    var $_elements = null;
-    var $_style = null;
-    var $_transform = null;
-    var $_id = null;
+	protected $_attributes = array();
 
-    function XML_SVG_Element($params = array())
-    {
-        foreach ($params as $p => $v) {
-            $param = '_' . $p;
-            $this->$param = $v;
-        }
-    }
+	protected $dynamic = array();
+	public $properties = array();
 
-    /**
-     * Most SVG elements can contain child elements. This method calls
-     * the printElement method of any child element added to this
-     * object by use of the addChild method.
-     */
-    function printElement()
-    {
-        // Loop and call.
-        if (is_array($this->_elements)) {
-            foreach ($this->_elements as $child) {
-                $child->printElement();
-            }
-        }
-    }
+	public function __get($attribute) {
+		error_log(get_class($this) . "__get($attribute)");
+		switch ($attribute) {
+		case 'right' : return $this->x + $this->width;
+		case 'bottom' : return $this->y + $this->height;
+		case 'x' :
+			if ($this->isAttribute('x')) return $this->getAttribute('x');
+			$left = 0;
+			if (isset($this->properties['x'])) $left = $this->properties['x'];
+			if (isset($this->{'right-of'})) $left = $this->{'right-of'};
+			if ($left instanceof self) $left = $left->right;
+			return $left; // + $this->marginx;
+		case 'y' :
+			if ($this->isAttribute('y')) return $this->getAttribute('y');
+			$top = 0;
+			if (isset($this->properties['y'])) $top = $this->properties['y'];
+			if (isset($this->{'below-of'})) $top = $this->{'below-of'};
+			if ($top instanceof self) $top = $top->bottom;
+			return $top; // + $this->marginy;
+		default: 
+			if ($this->isAttribute($attribute)) {
+				error_log(get_class($this) . "__get: $attribute is an attr");
+				return $this->getAttribute($attribute);
+			} elseif (isset($this->properties[$attribute])) {
+				error_log(get_class($this) . "__get: $attribute is not an attr");
+				return $this->properties[$attribute];
+			} else {
+				error_log(get_class($this) . "__get: $attribute is not set");
+			}
+		}
+	}
 
-    /**
-     * This method adds an object reference (or value, if $copy is
-     * true) to the _elements array.
-     */
-    function addChild(&$element, $copy = false)
-    {
-        if ($copy) {
-            $this->_elements[] = &$element->copy();
-        } else {
-            $this->_elements[] = &$element;
-        }
-    }
+	public function __set($attribute, $value) {
+		if (is_object($value)) {
+			error_log(get_class($this) . "__set($attribute, [" . get_class($value) . "])");
+		} else {
+			error_log(get_class($this) . "__set($attribute, $value)");
+		}
+		switch ($attribute) {
+		case 'right-of' :
+			unset($this->x);
+			$this->properties['right-of'] = $value;
+			break;
+		case 'below-of' : 
+			unset($this->y);
+			$this->properties['below-of'] = $value;
+			break;
+		case 'margin' :
+			$this->marginy = $value;
+			$this->marginx = $value;
+			break;
+		default :
+			if ($this->isAttribute($attribute)) {
+				//error_log(get_class($this) . ": $attribute is an attr");
+				$this->setAttribute($attribute, $value);
+			} else {
+				error_log(get_class($this) . "__set: $attribute is not an attr");
+				$this->properties[$attribute] = $value;
+				//error_log($this->properties[$attribute]);
+			}
+			break;
+		}
+	}
 
-    /**
-     * This method sends a message to the passed element requesting to
-     * be added as a child.
-     */
-    function addParent(&$parent)
-    {
-        if (is_subclass_of($parent, 'XML_SVG_Element')) {
-            $parent->addChild($this);
-        }
-    }
+	public function __unset($attribute) {
+		switch ($attribute) {
+		case 'margin' :
+			unset($this->marginy);
+			unset($this->marginx);
+			break;
+		default :
+			if (isset($this->properties[$attribute])) unset($this->properties[$attribute]);
+			else $this->removeAttribute($attribute);
+			break;
+		}
+	}
 
-    function copy()
-    {
-        if (version_compare(zend_version(), '2', '>')) {
-            return clone($this);
-        } else {
-            $xml_svg = $this;
-            return $xml_svg;
-        }
-    }
+	public static function getNew($value='', $namespaceURI='') {
+		$element = new static(static::$tag, $value, $namespaceURI);
+		$argarray = func_get_args();
+		call_user_func_array(array($element, 'initialize'), $argarray);
+		XML_SVG_Document::getInstance()->appendChild($element);
+		return $element;
+	}
 
-    /**
-     * Print each of the passed parameters, if they are set.
-     */
-    function printParams()
-    {
-        foreach (func_get_args() as $param) {
-            $_param = '_' . $param;
-            if (isset($this->$_param)) {
-                switch ($param) {
-                case 'filter':
-                    echo ' filter="url(#' . $this->$_param . ')"';
-                    break;
+	/** Initialize the object with some starting values
+	 */
+	protected function initialize() {
+	}
 
-                default:
-                    echo ' ' . str_replace('_', '-', $param) . '="' . $this->$_param . '"';
-                    break;
-                }
-            }
-        }
-    }
+	protected function isAttribute($name) {
+		if (empty($this->_attributes)) {
+			$this->_attributes = static::getAttributes();
+		}
+		//error_log(var_export($this->_attributes, true));
+		return in_array($name, $this->_attributes);
+	}
 
-    // Set any named attribute of an element to a value.
-    function setParam($param, $value)
-    {
-        $attr = '_' . $param;
-        $this->$attr = $value;
-    }
+	protected static function getAttributes() {
+		return static::$ATTR_CORE;
+	}
 
-    // Get any named attribute of an element.
-    function getParam($param)
-    {
-        $attr = '_' . $param;
-        if (isset($this->$attr)) {
-            return $this->$attr;
-        } else {
-            return null;
-        }
-    }
+	public function appendChildren() {
+		$children = func_get_args();
+		$this->_appendChildren($children);
+	}
+
+	/**
+	 * Helper function: given an array of XML_SVG_Element objects, append each 
+	 * of them as a child.
+	 */ 
+	private function _appendChildren($children) {
+		foreach ($children as $child) {
+			if (is_array($child)) {
+				$this->_appendChildren($child);
+			} elseif ($child instanceof self) {
+				$this->appendChild($child);
+			} else {
+				error_log(__METHOD__.':'.__LINE__.": bad argument");
+			}
+		}
+	}
 
     // Print out the object for debugging.
     function debug()

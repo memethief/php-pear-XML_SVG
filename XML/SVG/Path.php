@@ -17,27 +17,36 @@ require_once 'XML/SVG/Element.php';
  */
 class XML_SVG_Path extends XML_SVG_Element 
 {
+	protected static $tag = 'path';
+	private static $extra_attributes = array(
+		'class',
+		'style',
+		'externalResourcesRequired',
+		'transform',
+		'd',
+		'pathLength',
+	);
 
-    var $_d;
-
-    function printElement()
-    {
-        echo '<path';
-        $this->printParams('id', 'd', 'style', 'transform');
-        if (is_array($this->_elements)) {
-            // Print children, start and end tag.
-            print(">\n");
-            parent::printElement();
-            print("</path>\n");
-        } else {
-            // Print short tag.
-            print("/>\n");
-        }
-    }
+	public static function getNew($d='') {
+		$path = parent::getNew();
+		$path->d = $d;
+		return $path;
+	}
 
     function setShape($d)
     {
-        $this->_d = $d;
+		$this->setAttribute('d', $d);
+		// $this->_d = $d;
     }
+
+	protected static function getAttributes() {
+		return array_merge(
+			static::$ATTR_CONDITIONAL_PROCESSING,
+			static::$ATTR_CORE,
+			static::$ATTR_GRAPHICAL_EVENT,
+			static::$ATTR_PRESENTATION,
+			static::$extra_attributes
+		);
+	}
 
 }

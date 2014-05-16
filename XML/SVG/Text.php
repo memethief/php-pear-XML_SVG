@@ -17,17 +17,29 @@ require_once 'XML/SVG/Textpath.php';
  */
 class XML_SVG_Text extends XML_SVG_Textpath 
 {
+	protected static $tag = 'text';
+	private static $extra_attributes = array(
+		'class',
+		'style',
+		'externalResourcesRequired',
+		'transform',
+		'lengthAdjust',
+		'x',
+		'y',
+		'dx',
+		'dy',
+		'rotate',
+		'textLength',
+	);
 
-    function printElement()
-    {
-        parent::printElement('text');
-    }
-
-    function setShape($x, $y, $text)
-    {
-        $this->_x = $x;
-        $this->_y = $y;
-        $this->_text = $text;
-    }
+	protected static function getAttributes() {
+		return array_merge(
+			static::$ATTR_CONDITIONAL_PROCESSING,
+			static::$ATTR_CORE,
+			static::$ATTR_GRAPHICAL_EVENT,
+			static::$ATTR_PRESENTATION,
+			static::$extra_attributes
+		);
+	}
 
 }

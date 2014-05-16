@@ -8,31 +8,33 @@
  * @package XML_SVG
  * @license http://www.fsf.org/copyleft/lgpl.html
  */
-require_once 'XML/SVG/Fragment.php';
 
 
 /**
  * XML_SVG_Document
  *
- * This extends the XML_SVG_Fragment class. It wraps the XML_SVG_Frament output
+ * This extends the DOMDocument class. It wraps the XML_SVG_Frament output
  * with a content header, xml definition and doctype.
  *
  * @package XML_SVG
  */
-class XML_SVG_Document extends XML_SVG_Fragment
+class XML_SVG_Document extends DOMDocument
 {
+	private static $singleton;
 
-    var $_encoding = 'iso-8859-1';
+	private $_version  = '1.0';
+	private $_encoding = 'iso-8859-1';
 
-    function printElement()
-    {
-        header('Content-Type: image/svg+xml');
+	public static function getInstance() {
+		if (empty(self::$singleton)) {
+			self::$singleton = new self();
+		}
+		return self::$singleton;
+	}
 
-        print('<?xml version="1.0" encoding="' . $this->_encoding . "\"?>\n");
-        print('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
-	        "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">' . "\n");
-
-        parent::printElement();
-    }
+	function __construct() {
+		parent::__construct($this->_version, $this->_encoding);
+		$this->formatOutput = true;
+	}
 
 }
