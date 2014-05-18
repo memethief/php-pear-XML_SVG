@@ -17,38 +17,46 @@ require_once 'XML/SVG/Element.php';
  */
 class XML_SVG_Image extends XML_SVG_Element 
 {
+	protected static $tag = "image";
+	private static $extra_attributes = array(
+		'class',
+		'style',
+		'externalResourcesRequired',
+		'preserveAspectRatio',
+		'transform',
+		'x',
+		'y',
+		'width',
+		'height',
+	);
 
-    var $_x;
-    var $_y;
-    var $_width;
-    var $_height;
-    var $_href;
+	public static function getNew($href=false, $width=false, $height=false) {
+		$image = parent::getNew();
+		if (false !== $href) $image->{'xlink:href'} = $href;
+		if (false !== $width) $image->width = $width;
+		if (false !== $height) $image->height = $height;
+		return $image;
+	}
 
-    function printElement()
-    {
-        echo '<image';
-        $this->printParams('id', 'x', 'y', 'width', 'height', 'style');
-        if (!empty($this->_href)) {
-            echo ' xlink:href="' . $this->_href . '"';
-        }
-        if (is_array($this->_elements)) {
-            // Print children, start and end tag.
-            echo ">\n";
-            parent::printElement();
-            echo "</image>\n";
-        } else {
-            // Print short tag.
-            echo " />\n";
-        }
-    }
+	protected static function getAttributes() {
+		return array_merge(
+			static::$ATTR_CONDITIONAL_PROCESSING,
+			static::$ATTR_CORE,
+			static::$ATTR_GRAPHICAL_EVENT,
+			static::$ATTR_PRESENTATION,
+			static::$extra_attributes
+		);
+	}
 
-    function setShape($x, $y, $width, $height, $href)
-    {
-        $this->_x = $x;
-        $this->_y = $y;
-        $this->_width  = $width;
-        $this->_height  = $height;
-        $this->_href = $href;
-    }
+	public function __set($attribute, $value) {
+		switch ($attribute) {
+		case 'href' :
+			$this->setAttributeNS(XML_SVG_ROOT::$XMLNS_XLINK, 'xlink:href', $value);
+			break;
+		default :
+			parent::__set($attribute, $value);
+			break;
+		}
+	}
 
 }

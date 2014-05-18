@@ -17,33 +17,30 @@ require_once 'XML/SVG/Element.php';
  */
 class XML_SVG_Tspan extends XML_SVG_Element 
 {
+	protected static $tag = 'tspan';
+	private static $extra_attributes = array(
+		'class',
+		'style',
+		'externalResourcesRequired',
+		'transform',
+		'lengthAdjust',
+		'x',
+		'y',
+		'dx',
+		'dy',
+		'rotate',
+		'textLength',
+		'lengthAdjust',
+	);
 
-    var $_text;
-    var $_x;
-    var $_y;
-    var $_dx;
-    var $_dy;
-    var $_rotate;
-    var $_textLength;
-    var $_lengthAdjust;
-
-    function printElement()
-    {
-        echo '<tspan';
-        $this->printParams('id', 'x', 'y', 'dx', 'dy', 'rotate',
-                           'textLength', 'lengthAdjust', 'style', 'transform');
-        echo '>' . $this->_text;
-        if (is_array($this->_elements)) {
-            parent::printElement();
-        }
-        echo "</tspan>\n";
-    }
-
-    function setShape($x, $y, $text)
-    {
-        $this->_x = $x;
-        $this->_y = $y;
-        $this->_text  = $text;
-    }
+	protected static function getAttributes() {
+		return array_merge(
+			static::$ATTR_CONDITIONAL_PROCESSING,
+			static::$ATTR_CORE,
+			static::$ATTR_GRAPHICAL_EVENT,
+			static::$ATTR_PRESENTATION,
+			static::$extra_attributes
+		);
+	}
 
 }
