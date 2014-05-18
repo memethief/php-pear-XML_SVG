@@ -104,6 +104,15 @@ class XML_SVG_Element extends DOMElement
 		'word-spacing',
 		'writing-mode',
 	);
+	public static $ATTR_XLINK = array(
+		'xlink:href', 
+		'xlink:show', 
+		'xlink:actuate', 
+		'xlink:type', 
+		'xlink:role', 
+		'xlink:arcrole', 
+		'xlink:title',
+	);
 
 	protected $_attributes = array();
 
@@ -111,7 +120,8 @@ class XML_SVG_Element extends DOMElement
 	public $properties = array();
 
 	public function __get($attribute) {
-		error_log(get_class($this) . "__get($attribute)");
+		//error_log(get_class($this) . "__get($attribute)");
+		$attribute = str_replace("_", "-", $attribute);
 		switch ($attribute) {
 		case 'right' : return $this->x + $this->width;
 		case 'bottom' : return $this->y + $this->height;
@@ -131,23 +141,24 @@ class XML_SVG_Element extends DOMElement
 			return $top; // + $this->marginy;
 		default: 
 			if ($this->isAttribute($attribute)) {
-				error_log(get_class($this) . "__get: $attribute is an attr");
+				//error_log(get_class($this) . "__get: $attribute is an attr");
 				return $this->getAttribute($attribute);
 			} elseif (isset($this->properties[$attribute])) {
-				error_log(get_class($this) . "__get: $attribute is not an attr");
+				//error_log(get_class($this) . "__get: $attribute is not an attr");
 				return $this->properties[$attribute];
 			} else {
-				error_log(get_class($this) . "__get: $attribute is not set");
+				//error_log(get_class($this) . "__get: $attribute is not set");
 			}
 		}
 	}
 
 	public function __set($attribute, $value) {
 		if (is_object($value)) {
-			error_log(get_class($this) . "__set($attribute, [" . get_class($value) . "])");
+			//error_log(get_class($this) . "__set($attribute, [" . get_class($value) . "])");
 		} else {
-			error_log(get_class($this) . "__set($attribute, $value)");
+			//error_log(get_class($this) . "__set($attribute, $value)");
 		}
+		$attribute = str_replace("_", "-", $attribute);
 		switch ($attribute) {
 		case 'right-of' :
 			unset($this->x);
@@ -166,7 +177,7 @@ class XML_SVG_Element extends DOMElement
 				//error_log(get_class($this) . ": $attribute is an attr");
 				$this->setAttribute($attribute, $value);
 			} else {
-				error_log(get_class($this) . "__set: $attribute is not an attr");
+				//error_log(get_class($this) . "__set: $attribute is not an attr");
 				$this->properties[$attribute] = $value;
 				//error_log($this->properties[$attribute]);
 			}
@@ -175,6 +186,7 @@ class XML_SVG_Element extends DOMElement
 	}
 
 	public function __unset($attribute) {
+		$attribute = str_replace("_", "-", $attribute);
 		switch ($attribute) {
 		case 'margin' :
 			unset($this->marginy);
