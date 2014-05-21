@@ -1,0 +1,14 @@
+Tasks for conversion of XML_SVG to DOM
+
+* Rename classes to fit with SVG DOM specification here:
+  http://www.w3.org/TR/SVG11/svgdom.html
+* Update header doc blocks
+* Ensure this todo list is complete
+
+Tasks for conversion of XML_SVG to PEAR2
+
+* Ensure standards compliance as described here:
+  https://wiki.php.net/pear/rfc/pear2_standards
+** Update header doc blocks
+** Update class doc blocks
+
